@@ -18,11 +18,18 @@ mongoose.connect('mongodb+srv://vizzy:vizzy363@backend.vpzczlo.mongodb.net/track
 
 app.use(express.static(__dirname + "/pictures"))
 
+
+app.use('/pictures', express.static(process.cwd() + '/pictures'));
+
 app.use('/public', express.static(process.cwd() + '/public'));
 //initial html
 
 app.get("/", function(req, res) {
     res.sendFile(__dirname + "/views/index.html");
+  });
+
+  app.get("/", function(req, res) {
+    res.sendFile(__dirname + "/pictures/favicon.ico");
   });
 
   app.get("/views/exercise-tracker.html",(req, res) =>{
