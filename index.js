@@ -16,6 +16,7 @@ mongoose.connect('mongodb+srv://vizzy:vizzy363@backend.vpzczlo.mongodb.net/track
   useNewUrlParser: true
 });
 
+app.use(express.static(__dirname + "/pictures"))
 
 app.use('/public', express.static(process.cwd() + '/public'));
 //initial html
@@ -360,9 +361,41 @@ app.get("/views/api/whoami", (req, res)=>{
   res.json({ipaddress: ip, language:language, software,software});
 })
 
+//timestamp
+
+app.get("/views/timestamp.html", function(req, res) {
+  res.sendFile(__dirname + "/views/timestamp.html");
+});
+
+
+
+app.get("/views/api/:date?", (req, res) => {
+  const givenDate = req.params.date;
+  let date;
+
+  
+  if (!givenDate) {
+    date = new Date();
+  } else {
+  
+    const checkUnix = givenDate * 1;
+    date = isNaN(checkUnix) ? new Date(givenDate) : new Date(checkUnix);
+  }
+
+  
+  if (date == "Invalid Date") {
+    res.json({ error: "Invalid Date" });
+  } else {
+    const unix = date.getTime();
+    const utc = date.toUTCString();
+    res.json({ unix, utc });
+  }
+});
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
   console.log('Your app is listening on port ' + port)
 });
+
 
