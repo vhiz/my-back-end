@@ -4,6 +4,9 @@ const cors = require('cors');
 app.use(cors());
 const multer  = require('multer')
 app.use(express.static(__dirname + "/public"));
+var bodyParser = require('body-parser');
+
+app.use('/pictures', express.static(`${process.cwd()}/pictures`));
 //mongoose
 const mongoose = require('mongoose');
 
@@ -370,9 +373,6 @@ app.get("/views/api/whoami", (req, res)=>{
 
 //timestamp
 
-app.get("/views/timestamp.html", function(req, res) {
-  res.sendFile(__dirname + "/views/timestamp.html");
-});
 
 
 
@@ -399,6 +399,68 @@ app.get("/views/api/:date?", (req, res) => {
   }
 });
 
+//urlshort
+
+
+app.get('/views/urlshort.html', function(req, res) {
+  res.sendFile(process.cwd() + '/views/urlshort.html');
+});
+
+
+const urlshort = new Schema({
+  original : {type: String, required: true},
+  short : Number
+})
+
+const  Url = mongoose.model("Url", urlshort) 
+
+app.post ("/views/api/shorturl", bodyParser.urlencoded({ extended: false }),(req, res)=>{
+  let inputUrl = req.body['url']
+
+  let urlRegex = new RegExp(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi)
+  if(!inputUrl.match(urlRegex)){
+    res.json({error: 'Invalid url'})
+    return
+  }
+  let inputShort = 1
+
+  Url.findOne({})
+    .sort({short:'desc'})
+    .exec((err, result) =>{
+      if(!err && result != undefined){
+        inputShort = result.short + 1
+      }
+      if(!err){
+        Url.findOneAndUpdate(
+          {
+            original: inputUrl
+          },
+          {original:inputUrl, short: inputShort },
+          {new:true, upsert: true},
+          (err,savedUrl) =>{
+            if(!err){
+              res.json({original_url: inputUrl, short_url: savedUrl.short})
+            }
+          }
+        )
+      }
+    })
+ 
+  
+})
+
+
+app.get("/views/api/shorturl/:input", (req,res)=>{
+  let input = req.params.input
+
+  Url.findOne({short: input}, (err,result)=>{
+    if(!err && result != undefined){
+      res.redirect(result.original)
+    }else{
+      res.json('URL not found')
+    }
+  })
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
