@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 app.use(cors());
+const multer  = require('multer')
 app.use(express.static(__dirname + "/public"));
 //mongoose
 const mongoose = require('mongoose');
@@ -325,6 +326,28 @@ app.get('/api/exercises', (req, res) => {
     res.json(data);
   })
 });
+
+//filemetadata
+
+app.get("/views/filemetadata.html", function(req, res) {
+  res.sendFile(__dirname + "/views/filemetadata.html");
+});
+
+const upload = multer({ dest: 'uploads/' })
+
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+  try {
+    res.json({
+      "name": req.file.originalname,
+      "type": req.file.mimetype,
+      "size": req.file.size
+    });
+  } catch (err) {
+    res.send(400);
+  }
+});
+
+
   
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
