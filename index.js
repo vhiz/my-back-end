@@ -349,22 +349,18 @@ app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
 
 //headpraser
 
-
 app.get("/views/headpraser.html", function(req, res) {
   res.sendFile(__dirname + "/views/headpraser.html");
 });
 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
-});
-
-app.get("/api/whoami", (req, res)=>{
+app.get("/views/api/whoami", (req, res)=>{
   const ip = req.ip;
   const language = req.headers['accept-language']
   const software = req.headers['user-agent']
   res.json({ipaddress: ip, language:language, software,software});
 })
-  
+
+
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
   console.log('Your app is listening on port ' + port)
