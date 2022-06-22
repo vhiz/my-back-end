@@ -31,6 +31,10 @@ app.get("/", function(req, res) {
     res.sendFile(__dirname + "/views/index.html");
   });
 
+  app.get("/views/timestamp.html", function(req, res) {
+    res.sendFile(__dirname + "/views/timestamp.html");
+  });
+
   app.get("/", function(req, res) {
     res.sendFile(__dirname + "/pictures/favicon.ico");
   });
